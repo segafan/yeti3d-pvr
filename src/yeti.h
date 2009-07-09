@@ -468,6 +468,11 @@ extern void CODE_IN_IWRAM draw_texture(yeti_t* yeti, polyclip_t src, int n, int 
 extern void CODE_IN_IWRAM draw_poly(vertex_t* p, int n, YETI_ROM texture_t texture, framebuffer_t* dst, lua_t lua);
 extern int CODE_IN_IWRAM polygon_clip(yeti_t* yeti, vertex_t** dst, vertex_t** src, int n);
 extern void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int tid);
+
+void CODE_IN_IWRAM draw_sprite(
+  yeti_t* yeti, vertex_t a, vertex_t b,
+  YETI_ROM sprite_t sprite,
+  int cl, int ct, int cr, int cb, int mode);
   
 extern void CODE_IN_IWRAM draw_sprite_di(
   yeti_t* yeti,
