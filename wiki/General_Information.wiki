@@ -1,5 +1,5 @@
 #labels Featured
-*Yeti3d-pvr* is a port of the Yeti3D engine to the Sega Dreamcast videogame console. It is built with the free KallistiOS (KOS) development library and uses the onboard 3D hardware for rendering. Source code for a version of the demo using SDL for rendering has also been included the Subversion repository in for those interested (for example, those who wish to test changes on their PC), and should compile for Dreamcast although this has not been tested recently.
+*Yeti3d-pvr* is a port of the Yeti3D engine to the Sega Dreamcast videogame console. It is built with the free KallistiOS (KOS) development library and uses the onboard 3D hardware for rendering. [http://code.google.com/p/yeti3d-pvr/source/browse/trunk#trunk/platform/SDL Source code] for a version of the demo using SDL for rendering has also been included the Subversion repository in for those interested (for example, those who wish to test changes on their PC), and should compile for Dreamcast although this has not been tested recently.
 
 http://lh4.ggpht.com/_6B2U-HqFFMc/SlQx3dTGyUI/AAAAAAAAABQ/QHOZ-WeqPJg/s400/yeti3.JPG
 ^SDL port of Yeti3D running on a Mac^
