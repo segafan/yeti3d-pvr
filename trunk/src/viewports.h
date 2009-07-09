@@ -313,8 +313,8 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
 #define YETI_VIEWPORT_INTERVAL 35
 #define YETI_VIEWPORT_X1 0
 #define YETI_VIEWPORT_Y1 0
-#define YETI_VIEWPORT_X2 640
-#define YETI_VIEWPORT_Y2 480
+#define YETI_VIEWPORT_X2 639
+#define YETI_VIEWPORT_Y2 479
 #define YETI_VIEWPORT_WIDTH 640
 #define YETI_VIEWPORT_HEIGHT 480
 #define YETI_VIDEO_LUT

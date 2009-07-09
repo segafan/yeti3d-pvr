@@ -1,4 +1,6 @@
-#
+# Yeti3D PVR example makefile
+# 
+# Based on:
 # Basic KallistiOS skeleton / test program
 # (c)2001 Dan Potter
 #   
@@ -22,9 +24,6 @@ rm-elf:
 
 KOS_CFLAGS += -D__PATCH_DRAW_SPRITE__ -D__PATCH_DRAW_CLIPPED_POLY__
 
-# If you don't need a ROMDISK, then remove "romdisk.o" from the next few
-# lines. Also change the -l arguments to include everything you need,
-# such as -lmp3, etc.. these will need to go _before_ $(KOS_LIBS)
 $(TARGET): $(OBJS) 
 	$(KOS_CC) $(KOS_CFLAGS) $(KOS_LDFLAGS) -o $(TARGET) $(KOS_START) \
 		$(OBJS) $(OBJEXTRA) -lm -lparallax $(KOS_LIBS)

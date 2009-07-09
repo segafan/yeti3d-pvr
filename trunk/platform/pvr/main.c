@@ -131,7 +131,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
  {
    int j = order[i];
    /* Stolen from KGL to get the z value of the vertices. */
-   float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = f2fl(src[j]->z), w = 1.0f;
+   float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = 1.0/f2fl(src[j]->z), w = 1.0f;
 		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f)
       p[i].z = fl2f((0.5f * z) + 0.5f);
@@ -162,10 +162,11 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
     
     vert.argb = PVR_PACK_COLOR(1.0f, c, c, c);
     
-    /* We should probably check the values of vert.x and vert.y against the viewport. */
-    vert.x = check_bounds(f2fl(p[i].x), YETI_VIEWPORT_X1, YETI_VIEWPORT_X2);
-    vert.y = check_bounds(f2fl(p[i].y), YETI_VIEWPORT_Y1, YETI_VIEWPORT_Y2);
-    vert.z = 1.0 / f2fl(p[i].z);
+    /* We should probably check the values of vert.x and vert.y against the viewport, but right
+      now it seems to simply distort close-up clipped polygons... */
+    vert.x = f2fl(p[i].x);
+    vert.y = f2fl(p[i].y);
+    vert.z = f2fl(p[i].z);
     vert.u = p[i].u * yeti_to_gl;
     vert.v = p[i].v * yeti_to_gl;
     
@@ -175,6 +176,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   }
 }
 
+
 #ifdef __PATCH_DRAW_TEXTURE__
 /* This is disabled in the makefile--near-Z clipping either has no effect,
   I'm doing it improperly, or we just need a more accurate clipping algorithm?
@@ -183,7 +185,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
 void CODE_IN_IWRAM draw_texture(yeti_t* yeti, polyclip_t p, int n, int tid)
 {
   int i;
-
+  
   for (i = n; i--;)
   {
     if (
@@ -206,6 +208,7 @@ void CODE_IN_IWRAM draw_texture(yeti_t* yeti, polyclip_t p, int n, int tid)
       break;
     }
   }
+
   if (n > 2) draw_clipped_poly(yeti, p, n, tid);
 }
 #endif
@@ -330,7 +333,7 @@ int main(int argc, char **argv)
   plx_mat3d_init();
   plx_mat3d_mode(PLX_MAT_PROJECTION);
   plx_mat3d_identity();
-  plx_mat3d_perspective(85.0f, 640.0f / 480.0f, 0.1f, 40.0f);
+  plx_mat3d_perspective(85.0f, 640.0f / 480.0f, 0.1f, 1.0f);
   plx_mat3d_mode(PLX_MAT_MODELVIEW);
   plx_mat3d_identity();
     

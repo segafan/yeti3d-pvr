@@ -35,7 +35,7 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
 /* A lookup table of sorts for our sprites--
    given an index, we can look here to see if we have the sprite.
    This will be useful if we create a copy of the original sprite in memory
-   in case we need to redraw the one we have store in pvr memory.  Also, we
+   in case we need to redraw the one we have stored in pvr memory.  Also, we
    can easily access the copy on the pvr if we no longer need that sprite
    and wish to reclaim the memory. Using arrays has a few advantage over a
    linked list, but the one downside is that the size of the array isn't
@@ -200,19 +200,19 @@ void draw_sprite(yeti_t* yeti, vertex_t a, vertex_t b,
   if (check_synch(spr_hdr) < 0 ) return; /* We don't have a pvr-ified sprite. */
   
   /* Calculate Z values for all corners of the sprite. */
-   float x = f2fl(a.x), y = f2fl(a.y), z = f2fl(a.z), w = 1.0f;
+   float x = f2fl(a.x), y = f2fl(a.y), z = 1.0/f2fl(a.z), w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[0] = (0.5f * z) + 0.5f; else zval[0] = w;
     
-    x = f2fl(b.x); y = f2fl(a.y); z = f2fl(a.z); w = 1.0f;
+    x = f2fl(b.x); y = f2fl(a.y); z = 1.0/f2fl(a.z); w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[1] = (0.5f * z) + 0.5f; else zval[1] = w;
     
-    x = f2fl(a.x); y = f2fl(b.y); z = f2fl(b.z); w = 1.0f;
+    x = f2fl(a.x); y = f2fl(b.y); z = 1.0/f2fl(b.z); w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[2] = (0.5f * z) + 0.5f; else zval[2] = w;
     
-    x = f2fl(b.x); y = f2fl(b.y); z = f2fl(b.z); w = 1.0f;
+    x = f2fl(b.x); y = f2fl(b.y); z = 1.0/f2fl(b.z); w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[3] = (0.5f * z) + 0.5f; else zval[3] = w;  
    
@@ -233,7 +233,7 @@ void draw_sprite(yeti_t* yeti, vertex_t a, vertex_t b,
   /* Top left */  
   vert.x = x1;
   vert.y = y1;
-  vert.z = 1.0f/zval[0];
+  vert.z = zval[0];
   vert.u = (u1 > 0)? ((float)u1) / spr_hdr->tx_w : 0.0f;
   vert.v = (v1 > 0)? ((float)v1) / spr_hdr->tx_h : 0.0f;
   vert.flags = PVR_CMD_VERTEX;
@@ -241,21 +241,21 @@ void draw_sprite(yeti_t* yeti, vertex_t a, vertex_t b,
   
   /*Top right */
   vert.x = x2;
-  vert.z = 1.0f/zval[1];
+  vert.z = zval[1];
   vert.u = ((float)u2) / spr_hdr->tx_w;
   pvr_list_prim(PVR_LIST_TR_POLY, &vert, sizeof(vert));
   
   /* Bottom left */
   vert.x = x1;
   vert.y = y2;
-  vert.z = 1.0f/zval[2];
+  vert.z = zval[2];
   vert.u = (u1 > 0)? ((float)u1) / spr_hdr->tx_w : 0.0f;
   vert.v = ((float)v2) / spr_hdr->tx_h;
   pvr_list_prim(PVR_LIST_TR_POLY, &vert, sizeof(vert));
   
   /*Bottom right */
   vert.x = x2;
-  vert.z = 1.0f/zval[3];
+  vert.z = zval[3];
   vert.u = ((float)u2) / spr_hdr->tx_w;
   vert.flags = PVR_CMD_VERTEX_EOL;
   pvr_list_prim(PVR_LIST_TR_POLY, &vert, sizeof(vert));
