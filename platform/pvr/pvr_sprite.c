@@ -200,19 +200,19 @@ void draw_sprite(yeti_t* yeti, vertex_t a, vertex_t b,
   if (check_synch(spr_hdr) < 0 ) return; /* We don't have a pvr-ified sprite. */
   
   /* Calculate Z values for all corners of the sprite. */
-   float x = f2fl(a.x), y = f2fl(a.y), z = 1.0/f2fl(a.z), w = 1.0f;
+   float x = f2fl(a.x), y = f2fl(a.y), z = 40.0/f2fl(a.z), w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[0] = (0.5f * z) + 0.5f; else zval[0] = w;
     
-    x = f2fl(b.x); y = f2fl(a.y); z = 1.0/f2fl(a.z); w = 1.0f;
+    x = f2fl(b.x); y = f2fl(a.y); z = 40.0/f2fl(a.z); w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[1] = (0.5f * z) + 0.5f; else zval[1] = w;
     
-    x = f2fl(a.x); y = f2fl(b.y); z = 1.0/f2fl(b.z); w = 1.0f;
+    x = f2fl(a.x); y = f2fl(b.y); z = 40.0/f2fl(b.z); w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[2] = (0.5f * z) + 0.5f; else zval[2] = w;
     
-    x = f2fl(b.x); y = f2fl(b.y); z = 1.0/f2fl(b.z); w = 1.0f;
+    x = f2fl(b.x); y = f2fl(b.y); z = 40.0/f2fl(b.z); w = 1.0f;
   		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f) zval[3] = (0.5f * z) + 0.5f; else zval[3] = w;  
    

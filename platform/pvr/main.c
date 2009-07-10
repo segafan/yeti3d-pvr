@@ -67,15 +67,7 @@ pvr_ptr_t texture[YETI_TEXTURE_MAX];
 
 static float yeti_to_gl = 1.0 / (256 * 64); /* From the OpenGL example. */
 
-static float check_bounds(float start, float l_or_t, float r_or_b)
-{
-  float retval = start;
-  if (l_or_t < start < r_or_b) retval = start;
-  if (start < l_or_t) retval =l_or_t;
-  if (start > r_or_b) retval = r_or_b;
-  
-  return retval;
-}
+
 /* My understanding of this method of sorting vertices for polygon rendering came
    from KGL, but since Yeti only allows a maximum of 16 vertices for a polygon,
    this might be much simpler and faster than sorting vertices each time
@@ -125,18 +117,19 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   vert.oargb = 0;
   
  for (i=n; i--;)
-   order[n-1-i] = orders[ (16* (n-1)) + i];
+   order[n-1-i] = orders[ (16* (n-1)) + i]; /* There is a better way to do this.  Why the need to copy? */
  
  for (i=n; i--;)
  {
    int j = order[i];
    /* Stolen from KGL to get the z value of the vertices. */
-   float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = 1.0/f2fl(src[j]->z), w = 1.0f;
+   float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = 40.0/f2fl(src[j]->z), w = 1.0f;
 		mat_trans_single4(x, y, z, w);				
     if (w == 1.0f)
       p[i].z = fl2f((0.5f * z) + 0.5f);
    else
-      p[i].z = fl2f(w);
+      p[i].z = fl2f(w); /* Would it not make sense to just make these floats? We need not do
+      				any more math at this point... */
    
    p[i].x = src[j]->sx;
    p[i].y = src[j]->sy;
@@ -163,7 +156,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
     vert.argb = PVR_PACK_COLOR(1.0f, c, c, c);
     
     /* We should probably check the values of vert.x and vert.y against the viewport, but right
-      now it seems to simply distort close-up clipped polygons... */
+      now it seems to work ok without... */
     vert.x = f2fl(p[i].x);
     vert.y = f2fl(p[i].y);
     vert.z = f2fl(p[i].z);
@@ -176,42 +169,6 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   }
 }
 
-
-#ifdef __PATCH_DRAW_TEXTURE__
-/* This is disabled in the makefile--near-Z clipping either has no effect,
-  I'm doing it improperly, or we just need a more accurate clipping algorithm?
-  Define -D__PATCH_DRAW_TEXTURE__ in the makefile to try this code out.
-*/
-void CODE_IN_IWRAM draw_texture(yeti_t* yeti, polyclip_t p, int n, int tid)
-{
-  int i;
-  
-  for (i = n; i--;)
-  {
-    if (
-       (p[i]->x + p[i]->z) < 0 ||
-       (p[i]->z - p[i]->x) < 0 ||
-       (p[i]->y + p[i]->z) < 0 ||
-       (p[i]->z - p[i]->y) < 0 ||
-       (p[i]->z < 512)   ) /* Punting here a little bit... Should probably just use floating point on DC.*/
-    {
-      polyclip_t a, b;
-
-      for (i = n; i--; p[i]->d = p[i]->x + p[i]->z); n = polygon_clip(yeti, a, p, n); // Left
-      for (i = n; i--; a[i]->d = a[i]->z - a[i]->x); n = polygon_clip(yeti, b, a, n); // Right
-      for (i = n; i--; b[i]->d = b[i]->y + b[i]->z); n = polygon_clip(yeti, a, b, n); // Top
-      for (i = n; i--; a[i]->d = a[i]->z - a[i]->y); n = polygon_clip(yeti, b, a, n); // Bottom
-      for (i = n; i--; b[i]->d = b[i]->z          ); n = polygon_clip(yeti, a, b, n); // Near plane
-
-      p = a;
-      
-      break;
-    }
-  }
-
-  if (n > 2) draw_clipped_poly(yeti, p, n, tid);
-}
-#endif
 /* Updates the internal yeti keyboard.
   TODO:
   Just check one controller in case multiple controllers are plugged in.
@@ -333,7 +290,7 @@ int main(int argc, char **argv)
   plx_mat3d_init();
   plx_mat3d_mode(PLX_MAT_PROJECTION);
   plx_mat3d_identity();
-  plx_mat3d_perspective(85.0f, 640.0f / 480.0f, 0.1f, 1.0f);
+  plx_mat3d_perspective(85.0f, 640.0f / 480.0f, 0.1f, 40.0f);
   plx_mat3d_mode(PLX_MAT_MODELVIEW);
   plx_mat3d_identity();
     
