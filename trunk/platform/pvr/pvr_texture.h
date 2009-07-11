@@ -1,5 +1,5 @@
 /*
-pvr_sprite.h
+pvr_texture.h
 Copyright (C) 2009 - Joshua Sutherland
 
 This file is part of the Dreamcast PVR rendering code for the
@@ -37,18 +37,23 @@ $**
 **   YY   EE       TT     II       33 DD  DD
 **   YY   EEEEEE   TT   IIIIII 33333  DDDDD
 */
-#ifndef _PVR_SPRITE_H_
-#define _PVR_SPRITE_H_
+#ifndef _PVR_TEXTURE_H_
+#define _PVR_TEXTURE_H_
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-sprite_t sprite_to_texture(sprite_t sprite);
-void render_all_sprites();
+/* Use these to use the default Yeti3d palette and textures
+  in your program. Call them before you start the game loop. */
+void yeti_pvr_def_pal();
+void yeti_pvr_def_tex();
+
+/* Initializes the PVR and sets up our view window, etc. */
+void yeti_pvr_init();
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#endif /* _PVR_SPRITE_H_ */
+#endif /* _PVR_TEXTURE_H_ */
