@@ -4,14 +4,19 @@
 #   
 
 # Put the filename of the output binary here
-TARGET = yetiSDL.elf
+TARGET = yetiSDL
 
+# You may need to change the paths in these next two lines to reflect locations
+# on your own system--this is what works on mine.
+SDL_INC_DIR = /usr/include/SDL
+SDL_LIB_DIR = /usr/lib/SDL
 # List all of your C files here, but change the extension to ".o"
-OBJS = main.o ../../src/data.o ../../src/draw.o ../../src/extra.o ../../src/font.o  ../../src/game.o ../../src/maps.o ../../src/model.o ../../src/sprites.o ../../src/yeti.o
+OBJS = main.o ../../src/data.o ../../src/draw.o ../../src/extra.o \
+       ../../src/font.o  ../../src/game.o ../../src/maps.o ../../src/model.o \
+       ../../src/sprites.o ../../src/yeti.o
 
 all: rm-elf $(TARGET)
 
-include $(KOS_BASE)/Makefile.rules
 
 clean:
 	-rm -f $(TARGET) $(OBJS)
@@ -19,18 +24,16 @@ clean:
 rm-elf:
 	-rm -f $(TARGET)
 
-KOS_CFLAGS += -I$(KOS_BASE)/include/SDL
+CFLAGS = -g -Wall -I$(SDL_INC_DIR) -D__YETI_SDL__
 
-# If you don't need a ROMDISK, then remove "romdisk.o" from the next few
-# lines. Also change the -l arguments to include everything you need,
-# such as -lmp3, etc.. these will need to go _before_ $(KOS_LIBS)
+LDFLAGS = -L$(SDL_LIB_DIR) -lSDL
 $(TARGET): $(OBJS) 
-	$(KOS_CC) $(KOS_CFLAGS) $(KOS_LDFLAGS) -o $(TARGET) $(KOS_START) \
-		$(OBJS) $(OBJEXTRA) -lSDL $(KOS_LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET) \
+		$(OBJS)
 
 run: $(TARGET)
-	$(KOS_LOADER) $(TARGET)
+	./$(TARGET)
 
 dist:
 	rm -f $(OBJS)
-	$(KOS_STRIP) $(TARGET)
+	$(STRIP) $(TARGET)
