@@ -8,8 +8,6 @@ reusable code, so make it so.
 See if we can make the clipping code more accurate?  I'm noticing some see-thru
 corners and stuff like that.
 
-Write a Linux makefile for the SDL code--it's here for a reason, so make it usable.
-
 See if we can get models (such as the cube defined in src/game.c) to render with
 lighting?  Flat-shaded is a bit ugly.
 
