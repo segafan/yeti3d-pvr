@@ -1,10 +1,17 @@
 #labels Featured
+==General Info on yeti3d-pvr==
 *Yeti3d-pvr* is a port of the Yeti3D engine to the Sega Dreamcast videogame console. It is built with the free KallistiOS (KOS) development library and uses the onboard 3D hardware for rendering. [http://code.google.com/p/yeti3d-pvr/source/browse/trunk#trunk/platform/SDL Source code] for a version of the demo using SDL for rendering has also been included the Subversion repository in for those interested (for example, those who wish to test changes on their PC), and should compile for Dreamcast although this has not been tested recently.
 
 http://lh4.ggpht.com/_6B2U-HqFFMc/SlQx3dTGyUI/AAAAAAAAABQ/QHOZ-WeqPJg/s400/yeti3.JPG
 ^SDL port of Yeti3D running on a Mac^
 ----
-Yeti3D is a portable 3D game engine inspired by the [http://en.wikipedia.org/wiki/Cube_FPS CUBE] engine and created by Derek J. Evans.  It was originally designed for the Gameboy Advance and other handheld devices.  It has been ported to such devices as the Gamepark GP32, Sony !PlayStation, Nintendo !GameCube, Pocket PC, Nokia Series 60 mobile phones, iPhone, Windows PC (using OpenGL, !DirectDraw, [http://www.storm-studios.net/onethirty8/Yetistuff.html and SDL]), [http://www.storm-studios.net/onethirty8/Yetistuff.html Apple MacIntosh (using SDL)], and the [http://www.dreamcast-scene.com/index.php/Main/Yeti3D first port to the Sega Dreamcast] was done in 2004 by a member of the Dreamcast homebrew software community known as Vortexx.
+==General Info on the Yeti3D Engine==
+*Yeti3D* is a portable 3D game engine inspired by the [http://en.wikipedia.org/wiki/Cube_FPS CUBE] engine and created by Derek J. Evans.  It was originally designed for the Gameboy Advance and other handheld devices.  It has been ported to such devices as the Gamepark GP32, Sony !PlayStation, Nintendo !GameCube, Pocket PC, Nokia Series 60 mobile phones, iPhone, Windows PC (using OpenGL, !DirectDraw, [http://www.storm-studios.net/onethirty8/Yetistuff.html and SDL]), [http://www.storm-studios.net/onethirty8/Yetistuff.html Apple MacIntosh (using SDL)], and the [http://vorrtexx.ionichost.com/yeti3DC/index.html first port to the Sega Dreamcast] was done in 2004 by a member of the Dreamcast homebrew software community known as Vortexx.  For information specific to that port, see the [http://www.dreamcast-scene.com/index.php/Main/Yeti3D wiki entry] at Dreamcast-Scene.
+
+Ron at Dreamcast Es was working on a Dreamcast port of the SDL-rendered demo as of Spring, 2008.  A quick web search did not produce any links to binaries or source code, although he did release a video on YouTube.
+----
+<wiki:video url=http://www.youtube.com/watch?v=3sTp0opjMXI>
+^Ron's SDL port of Yeti3D runing on a Dreamcast^
 ----
 http://lh5.ggpht.com/_6B2U-HqFFMc/SlQz-_ON-2I/AAAAAAAAAB0/KrNK6UEhUXI/s288/yeti1.JPG
 ^SDL port of Yeti3D running on a Mac^
