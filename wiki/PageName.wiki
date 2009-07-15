@@ -1,5 +1,3 @@
-#summary wiki sidebar
-
 [General_Information General Information]
 
 [Example_Code Example Code]
