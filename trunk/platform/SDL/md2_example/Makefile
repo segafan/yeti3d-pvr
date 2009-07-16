@@ -1,19 +1,22 @@
 #
+# Yeti3d example using md2 models
+#
+# Makefile based on:
 # Basic KallistiOS skeleton / test program
 # (c)2001 Dan Potter
 #   
 
 # Put the filename of the output binary here
-TARGET = yetiSDL
+TARGET = yeti_md2
 
 # You may need to change the paths in these next two lines to reflect locations
 # on your own system--this is what works on mine.
 SDL_INC_DIR = /usr/include/SDL
 SDL_LIB_DIR = /usr/lib/SDL
 # List all of your C files here, but change the extension to ".o"
-OBJS = main.o ../../src/data.o ../../src/draw.o ../../src/extra.o \
-       ../../src/font.o  ../../src/game.o ../../src/maps.o \
-       ../../src/sprites.o ../../src/yeti.o
+OBJS = main.o ../../../src/data.o ../../../src/draw.o ../../../src/extra.o \
+       ../../../src/font.o  game.o ../../../src/maps.o ../../../src/model.o\
+       ../../../src/md2.o ../../../src/sprites.o ../../../src/yeti.o
 
 all: rm-elf $(TARGET)
 
@@ -24,9 +27,9 @@ clean:
 rm-elf:
 	-rm -f $(TARGET)
 
-CFLAGS = -g -Wall -I$(SDL_INC_DIR) -D__YETI_SDL__
+CFLAGS = -g -Wall -I$(SDL_INC_DIR) -I../../../src -D__YETI_SDL__
 
-LDFLAGS = -L$(SDL_LIB_DIR) -lSDL
+LDFLAGS = -L$(SDL_LIB_DIR) -lSDL_image -lSDL
 $(TARGET): $(OBJS) 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET) \
 		$(OBJS)

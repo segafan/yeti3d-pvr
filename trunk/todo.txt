@@ -2,7 +2,7 @@ Texture rendering is really inefficient, and we would do well to remove all of
 the fixed->floating->fixed point conversions in there that really aren't needed.
 Overall speed of the demo seems fine, but that's no reason to write ugly code.
 
-Split all the PVR drawing code to its own module(s).  This is supposed to be
+Split all the PVR drawing code into the src directory.  This is supposed to be
 reusable code, so make it so.
 
 See if we can make the clipping code more accurate?  I'm noticing some see-thru
@@ -11,4 +11,5 @@ corners and stuff like that.
 See if we can get models (such as the cube defined in src/game.c) to render with
 lighting?  Flat-shaded is a bit ugly.
 
-See if the md2 code actually works.  Nothing in there looks like it needs Windows.
+Implement md2 drawing in the PVR version of the code, with __PATCH_DRAW_MD2___
+defines.

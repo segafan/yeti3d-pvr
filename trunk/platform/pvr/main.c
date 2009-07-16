@@ -96,7 +96,7 @@ void IdleFunc()
       to open/close, which display list is open, or any of that when using PVR DMA.
       We submit everything with pvr_list_prim instead of pvr_prim and things get
       submitted in the right order automatically. Just run your game loop in between
-      "pvr_scene_begin();" and "pvr_scene_finish(); and the rest is taken care of. */    
+      "pvr_scene_begin();" and "pvr_scene_finish();" and the rest is taken care of. */    
     
     game_loop(&yeti);
     
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 
  int done = 0;
  
-  yeti_pvr_init();  /* Initialize the PV, set up vertex buffers, etc... call this first! */
+  yeti_pvr_init();  /* Initialize the PVR, set up vertex buffers, etc... call this first! */
   
   yeti_pvr_def_pal(); /* Use the palette defined in the original Yeti source code. */
   yeti_pvr_def_tex(); /* Use the textures defined in the original Yeti source code. */
