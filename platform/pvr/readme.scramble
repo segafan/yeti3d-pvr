@@ -1,0 +1,9 @@
+This is Marcus Comstedt's scramble.c but I changed some text in main() that
+won't affect functionality.  For anyone who may be new to Dreamcast development,
+homebrew programs must be scrambled in order to be used on a self-booting disc,
+and this is the program that everyone uses to scramble their binaries.
+
+To compile (under Linux), typing "gcc -o scramble scramble.c"
+should give you a working scramble executable.  Windows (Cygwin) users will
+probably want to type "gcc -o scramble.exe scramble.c," although you probably
+already have scramble if you're using the DCDev ISO.

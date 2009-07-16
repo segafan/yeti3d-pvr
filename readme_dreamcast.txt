@@ -2,15 +2,8 @@ CREDITS:
 Derek J. Evans - Yeti3D engine and map editor
 Gazin Mattieu(ThunderZ) - GP32 port of Yeti3D engine and modified map editor
 Vortexx - Dreamcast port of Yeti3D engine
-Joshua Sutherland (OneThirty8) - SDL example, Dreamcast PVR port and example
-Sam Lantinga - Simple Directmedia Layer
+Joshua Sutherland (OneThirty8) - SDL example, Dreamcast PVR port and exampleSam Lantinga - Simple Directmedia Layer
 
-
-In the OpenGL demo and the DirectDraw demo, the controls are slightly different
-than in this SDL version.  This was because SDLK_RCTRL didn't seem to work on
-OS X when I compiled a version for the Macintosh, and I haven't touched that code
-since 2004.  So, if you're compiling for Windows or Dreamcast, you should be able
-to change it back to the Control button for firing a bullet.
 
 Controls are mapped as follows:
 SDL:
@@ -18,7 +11,7 @@ UP      = move forward
 DOWN = move backward
 LEFT    = turn left
 RIGHT  = turn right
-ENTER  = fire a bullet
+RCTRL  = fire a bullet
 SPACE = jump
 A         = look up
 Z         = look down

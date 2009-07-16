@@ -46,7 +46,10 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
 #include <stdlib.h>
 #include <stdio.h>
 #include <SDL.h>
-#include "../../src/game.h"
+#include <SDL_image.h>
+#include "model.h"
+#include "game.h"
+#include "extra.h"
 
 framebuffer_t framebuffer; //gives us somewhere to draw our stuff.
 yeti_t yeti;
@@ -54,6 +57,8 @@ int oldTick=0; // Used to help limit the framerate.
 int done=0;    // Keeps track of whether or not we're still playing.
 SDL_Surface *screen; // our video surface
 SDL_Event event;
+model_t *testmd2;
+skin_t skin;
 
 #define title (YETI_STR_TITLE " SDL Demo " YETI_STR_VERSION " - " YETI_STR_COPYRIGHT)
 
@@ -102,11 +107,14 @@ void d3d_flip() // checks whether we're ready to draw a frame, and if so it draw
 }
 
 
-
 int main(int argc, char *argv[])
 {
 
 Uint8* keys;  // to keep track of keypresses later on.
+SDL_Surface *temp_skin;
+SDL_Surface *convert_skin;
+int i, j;
+u16 *skinsrc;
 
   //Initialize SDL video.
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 )
@@ -116,6 +124,10 @@ Uint8* keys;  // to keep track of keypresses later on.
   }
   atexit(SDL_Quit);
 
+  testmd2 = (model_t *)yeti_load_file("test.md2");
+  printf("Opened test.md2 successfully.\r\n");
+  temp_skin = IMG_Load("test.jpg");
+  
   // set up our video surface to have the same width and height as our viewport
   screen=SDL_SetVideoMode(YETI_VIEWPORT_WIDTH,YETI_VIEWPORT_HEIGHT,16,SDL_HWSURFACE|SDL_DOUBLEBUF);
   if ( screen == NULL )
@@ -124,19 +136,32 @@ Uint8* keys;  // to keep track of keypresses later on.
                YETI_VIEWPORT_HEIGHT, SDL_GetError());
     exit(1);
   }
+  convert_skin = SDL_CreateRGBSurface (SDL_SWSURFACE, 256, 256, 16, 
+			31, 31 << 5, 31 << 10, 1<<15);
+  SDL_BlitSurface(temp_skin, NULL, convert_skin, NULL);
+  skinsrc = (u16 *)convert_skin->pixels;
+  for (i=0; i< 256; i++)
+  {
+    for (j=0; j< 256; j++)
+      skin[i][j] = skinsrc[j];
+     skinsrc+=256;
+  }
+  SDL_FreeSurface(temp_skin);
+  SDL_FreeSurface(convert_skin);
 #ifndef _arch_dreamcast //SDL on the Dreamcast doesn't use a Window manager, so...
   SDL_WM_SetCaption(title, NULL); // Write something a bit more interesting than "SDL App" on our window.
 #endif
-  //Initiallize Yeti3D
   yeti_init(&yeti, &framebuffer, &framebuffer, textures, palette, lua);
+
   game_init(&yeti);
+
 
 
   while(done==0) // While we're not done playing, keep looping.
   {
 
   d3d_flip();
-
+    
     while ( SDL_PollEvent(&event) ) // Here, if the user presses ESCAPE, we quit.
     {
       if ( event.type == SDL_QUIT )  {  done = 1;  }
@@ -162,7 +187,7 @@ Uint8* keys;  // to keep track of keypresses later on.
   yeti.keyboard.b      = keys[SDLK_SPACE];
   yeti.keyboard.l      = keys[SDLK_a];
   yeti.keyboard.r      = keys[SDLK_z];
-  yeti.keyboard.select = keys[SDLK_ESCAPE];
+  yeti.keyboard.select = keys[SDLK_RETURN]; /* Use this to change the model animation? */
 
   }
 
