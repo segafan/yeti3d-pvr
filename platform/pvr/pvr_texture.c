@@ -52,7 +52,8 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
 /* Declaring the vertex buffers like this I learned from the DC video code in 
    Yabuse. It's a great resource to look at to figure out the PVR DMA stuff,
    which was necessary here since Yeti triggers the drawing routines in such a
-   way that it's difficult to switch display lists when we need to. */
+   way that it's difficult to switch display lists when we need to. Using memalign
+   would probably work just as well, but these won't ever need to change, right? */
    
 static uint8 op_vbuf[1024 * 512] __attribute__((aligned(32)));
 static uint8 tr_vbuf[1024 * 256] __attribute__((aligned(32)));
@@ -60,7 +61,6 @@ static uint8 tr_vbuf[1024 * 256] __attribute__((aligned(32)));
 pvr_ptr_t texture[YETI_TEXTURE_MAX];
 
 static float yeti_to_gl = 1.0 / (256 * 64); /* From the OpenGL example. */
-
 
 /* My understanding of this method of sorting vertices for polygon rendering came
    from KGL, but since Yeti only allows a maximum of 16 vertices for a polygon,
@@ -112,7 +112,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   
  for (i=n; i--;)
    order[n-1-i] = orders[ (16* (n-1)) + i]; /* There is a better way to do this.  Why the need to copy? */
- 
+   
  for (i=n; i--;)
  {
    int j = order[i];
@@ -156,6 +156,70 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
     vert.z = f2fl(p[i].z);
     vert.u = p[i].u * yeti_to_gl;
     vert.v = p[i].v * yeti_to_gl;
+    
+    vert.flags = (i) ? PVR_CMD_VERTEX : PVR_CMD_VERTEX_EOL ;
+    
+    pvr_list_prim(PVR_LIST_OP_POLY, &vert, sizeof(vert));
+  }
+}
+
+/* Our md2_clipped poly should look an awful lot like our draw_clipped_poly. */
+void CODE_IN_IWRAM md2_clipped_poly(yeti_t* yeti, polyclip_t src, int n, u16* skin)
+{
+  int i;
+  polygon_t p;
+  pvr_poly_cxt_t cxt;
+  pvr_poly_hdr_t hdr;
+  pvr_vertex_t vert;
+  int order[16];
+
+/* If we do not have at least 3 vertices, we do not have a polygon. */ 
+  if (n < 3)
+    return;
+  
+  pvr_poly_cxt_txr(&cxt, PVR_LIST_OP_POLY, PVR_TXRFMT_RGB565, 256, 256, skin, PVR_FILTER_TRILINEAR1);
+  pvr_poly_compile(&hdr, &cxt);
+  pvr_list_prim(PVR_LIST_OP_POLY, &hdr, sizeof(hdr));
+  vert.oargb = 0;
+  
+ for (i=n; i--;)
+   order[n-1-i] = orders[ (16* (n-1)) + i]; /* There is a better way to do this.  Why the need to copy? */
+ 
+ for (i=n; i--;)
+ {
+   int j = order[i];
+
+   float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = 40.0/f2fl(src[j]->z), w = 1.0f;
+		mat_trans_single4(x, y, z, w);				
+    if (w == 1.0f)
+      p[i].z = fl2f((0.5f * z) + 0.5f);
+   else
+      p[i].z = fl2f(w); 
+   
+   p[i].x = src[j]->sx;
+   p[i].y = src[j]->sy;
+   p[i].u = src[j]->u;
+   p[i].v = src[j]->v;
+   p[i].l = src[j]->l;
+    
+ }
+
+  
+
+/* Draw the polygon */
+  for (i=n; i--;) 
+  {
+  /* We should be able to do some cheap lighting here... */
+   /* float c = 1.0 * p[i].l / i2f(63); 
+    
+    vert.argb = PVR_PACK_COLOR(1.0f, c, c, c); */
+     vert.argb = PVR_PACK_COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+    vert.x = f2fl(p[i].x);
+    vert.y = f2fl(p[i].y);
+    vert.z = f2fl(p[i].z);
+    vert.u = f2i(p[i].u) * 1.0f / 256.0f;
+    vert.v = f2i(p[i].v) * 1.0f / 256.0f;
     
     vert.flags = (i) ? PVR_CMD_VERTEX : PVR_CMD_VERTEX_EOL ;
     

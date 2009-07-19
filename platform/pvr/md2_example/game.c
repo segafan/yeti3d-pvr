@@ -176,7 +176,6 @@ void bullet_collision(entity_t* e1, entity_t* e2)
     md2_info_t *md2_info = e2->tag;
     md2_info->st_frm = md2_get_frame(e2, "pain101");
     md2_info->end_frm = md2_get_frame(e2, "pain104");
-    entity_turn_right(e2);
     entity_move_backwards(e2);
     md2_info->cur_frm = 0;
     e2->ontick = guard_pain;
@@ -287,6 +286,7 @@ void guard_pain(entity_t*e)
   }
 
   e->ondraw = md2_draw2;
+  entity_move_backwards(e);
   e->xx = friction(e->xx, 50);
   e->yy = friction(e->yy, 50);
 
@@ -317,7 +317,7 @@ void guard_attack(entity_t* e)
   entity_default(e, FALSE, FALSE);
 
 }
-extern skin_t skin;
+extern skin_t *skin;
 
 void game_init(yeti_t* yeti)
 {
@@ -344,7 +344,7 @@ void game_init(yeti_t* yeti)
       {
         md2_info_t *md2_info = malloc(sizeof(md2_info_t));
 	entity_t *e;
-	md2_info->skin = &skin;
+	md2_info->skin = skin;
         e = yeti_entity(yeti, i2f(x), i2f(y), i2f(1), guard_behaviour);
 	e->tag = md2_info;
       }

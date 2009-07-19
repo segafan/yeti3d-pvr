@@ -43,6 +43,7 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
 #undef CODE_IN_IWRAM 
 #define CODE_IN_IWRAM 
 
+#ifndef __PATCH_MD2__
 void CODE_IN_IWRAM md2_tmap(vertex_t* p, int n, YETI_ROM u16* texture, int textsize, framebuffer_t* dst)
 {
   int lt_i = 0, lt_x = 0, lt_xx = 0, lt_u = 0, lt_uu = 0, lt_v = 0, lt_vv = 0;
@@ -122,6 +123,9 @@ void CODE_IN_IWRAM md2_clipped_poly(yeti_t* yeti, polyclip_t src, int n, u16* sk
 
   md2_tmap(p, n, skin, 8, yeti->viewport.back);
 }
+#else
+void CODE_IN_IWRAM md2_clipped_poly(yeti_t* yeti, polyclip_t src, int n, u16* skin);
+#endif /* __PATCH__MD2_TMAP__ */
 
 void CODE_IN_IWRAM md2_unclipped_poly(yeti_t* yeti, polyclip_t p, int n, u16* skin)
 {
