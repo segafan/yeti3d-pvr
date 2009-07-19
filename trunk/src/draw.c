@@ -927,7 +927,6 @@ void CODE_IN_IWRAM yeti_draw(yeti_t* yeti)
     for (e1 = c1->entities; e1; e1 = e1->next)
     {
       if (e1->ondraw) e1->ondraw(e1); else draw_entity_as_sprite(e1);
-      //draw_entity_as_model(e1);
     }
   }
 
