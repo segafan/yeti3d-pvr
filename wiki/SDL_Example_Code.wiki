@@ -1,5 +1,6 @@
 #summary Basic example using SDL to render Yeti3D
 #labels Phase-Implementation
+<wiki:toc max_depth="2" />
 = Introduction =
 If you are using Yeti3D to write a game for a console such as the Dreamcast or GP32, you may find it helpful to test changes to your game on your PC.  This isn't hard to do using SDL.  This code was adapted from the !DirectDraw example by Derek J. Evans.
 
