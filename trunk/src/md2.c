@@ -2,6 +2,7 @@
 md2.c
 Copyright (C) Joshua Sutherland
 
+Based on model.c
 Copyright (C) 2003 - Derek John Evans 
 
 This file is part of Yeti3D Portable Engine
@@ -79,6 +80,15 @@ typedef struct
   short next;
   short triangle;
 } bucket_node_t;
+#ifdef __PATCH_MD2__
+
+void md2_start(u16* skin);
+
+#else
+
+#define md2_start(BLAH)
+
+#endif
 
 void md2_draw2(entity_t* e)
 {
@@ -92,9 +102,12 @@ void md2_draw2(entity_t* e)
   matrx_t m;
   yeti_t* yeti = e->yeti;
   model_t* model = e->visual.data;
+  cell_t *cell;
+  int frame_range;
+  frame_t* f;
   
-  int frame_range = md2_info->end_frm - md2_info->st_frm;
-  frame_t* f = (frame_t*)((int)model + model->offsetFrames + model->frameSize * (md2_info->st_frm +((md2_info->cur_frm++/2) % frame_range)));
+  frame_range = md2_info->end_frm - md2_info->st_frm;
+  f = (frame_t*)((int)model + model->offsetFrames + model->frameSize * (md2_info->st_frm +((md2_info->cur_frm++ >> 1) % frame_range)));
   triangle_t* t = (triangle_t*)((int)model + model->offsetTriangles);
   textureCoordinate_t* tc = (textureCoordinate_t*)((int)model + model->offsetTexCoords);
   
@@ -108,11 +121,16 @@ void md2_draw2(entity_t* e)
     int x = f2i(m[0][0] * u + m[0][1] * v + m[0][2] * w) + e->x - yeti->camera->x;
     int y = f2i(m[1][0] * u + m[1][1] * v + m[1][2] * w) + e->z - yeti->camera->z;
     int z = f2i(m[2][0] * u + m[2][1] * v + m[2][2] * w) + e->y - yeti->camera->y;
-
+    
+    int cx = f2i(m[0][0] * u + m[0][1] * v + m[0][2] * w) + e->x;
+    int cz = f2i(m[2][0] * u + m[2][1] * v + m[2][2] * w) + e->y;
+    
     verts[i].x = f2i(yeti->m[0][0] * x + yeti->m[0][1] * y + yeti->m[0][2] * z);
     verts[i].y = yeti->is2d ? y : f2i(yeti->m[1][0] * x + yeti->m[1][1] * y + yeti->m[1][2] * z);
     verts[i].z = f2i(yeti->m[2][0] * x + yeti->m[2][1] * y + yeti->m[2][2] * z);
-
+    
+    cell = &yeti->cells[f2i(cz)][f2i(cx)];
+    verts[i].l = cell->lit;
     vertex_project(&verts[i]);
   }
   for (i = 0; i < model->numTriangles; i++)
@@ -126,6 +144,9 @@ void md2_draw2(entity_t* e)
     nodes[nnodes].triangle = i;
     buckets[bid] = nnodes++;
   }
+  
+  md2_start((u16 *)md2_info->skin);
+  
   for (bid = 0; bid < YETI_TRIANGLE_BUCKET_MAX; bid++)
   {
     for (i = buckets[bid]; i; i = nodes[i].next)

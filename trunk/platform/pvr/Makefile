@@ -20,7 +20,7 @@ all: rm-elf $(TARGET)
 include $(KOS_BASE)/Makefile.rules
 
 clean:
-	-rm -f $(TARGET) $(OBJS) $(BIN) $(FIRST_READ)
+	-rm -f $(TARGET) $(OBJS) $(BIN) scramble $(FIRST_READ)
 	
 scramble: 
 	gcc -o scramble ../../tools/scramble.c	
@@ -66,4 +66,14 @@ mscd: $(TARGET) $(BIN) scramble $(FIRST_READ)
 	rm disc/data/1st_read.bin
 	cdrecord dev=$(CDRECORD_DEV) speed=4 gracetime=2 -tao -multi -eject -xa disc/session2.iso
 	rm disc/session?.iso
+	
+archives:   $(TARGET) $(BIN) scramble $(FIRST_READ) 
+	-rm -f $(TARGET)
+	-rm -f $(BIN)
+	-rm -f $(OBJS)
+	rm -f scramble
+	mv $(FIRST_READ) disc/data/1st_read.bin
+	tar -czf ~/yeti3dpvr_md2.tgz --exclude-vcs disc/data
+	rm disc/data/1st_read.bin
+	tar -czf ~/yeti3dpvr_md2_source.tgz --exclude-vcs ../../../yeti3d-pvr
 	

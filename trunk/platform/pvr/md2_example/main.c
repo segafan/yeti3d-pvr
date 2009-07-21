@@ -80,7 +80,7 @@ void keyboard_update(keyboard_t* kb)
   kb->r      = (st->rtrig > 90) ? 1 : 0;
   
   if (st->buttons & CONT_START) arch_menu();
-  
+
  MAPLE_FOREACH_END()
 }
  
