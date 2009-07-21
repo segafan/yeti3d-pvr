@@ -9,11 +9,12 @@
 TARGET = yetipvr.elf
 BIN = yetipvr.bin
 FIRST_READ = 1st_read.bin
+#Change this to match your CD burner's device ID.
 CDRECORD_DEV = /dev/scd0
 
 # List all of your C files here, but change the extension to ".o"
 OBJS = main.o ../pvr_texture.o ../pvr_sprite.o ../../../src/data.o ../../../src/draw.o \
-       ../../../src/extra.o ../../../src/font.o game.o ../../../src/maps.o \
+       ../../../src/extra.o ../../common/md2/game.o ../../../src/maps.o \
        ../../../src/md2.o ../../../src/model.o ../../../src/sprites.o ../../../src/yeti.o
 
 all: rm-elf $(TARGET)
@@ -75,7 +76,7 @@ archives:   $(TARGET) $(BIN) scramble $(FIRST_READ)
 	-rm -f $(OBJS)
 	rm -f scramble
 	mv $(FIRST_READ) disc/data/1st_read.bin
-	tar -czf ~/yeti3dpvr_md2.tgz  disc/data
+	tar -czf ~/yeti3dpvr_md2.tgz --exclude-vcs disc/data
 	rm disc/data/1st_read.bin
-	tar -czf ~/yeti3dpvr_md2_source.tgz ../../../../yeti3d-pvr
+	tar -czf ~/yeti3dpvr_md2_source.tgz --exclude-vcs ../../../../yeti3d-pvr
 	

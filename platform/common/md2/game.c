@@ -124,6 +124,9 @@ void entity_kill(entity_t* e)
 }
 
 /******************************************************************************/
+void guard_pain(entity_t* e);
+void guard_death(entity_t* e);
+void guard_attack(entity_t* e1);
 
 void entity_default(entity_t* e, int isjumping, int iscrawling)
 {
@@ -164,8 +167,6 @@ void entity_default(entity_t* e, int isjumping, int iscrawling)
   if (e->life < 0) entity_kill(e);
 }
 
-void guard_pain(entity_t*e);
-
 void bullet_collision(entity_t* e1, entity_t* e2)
 {
   yeti_t* yeti = (yeti_t*)e1->yeti;
@@ -176,12 +177,19 @@ void bullet_collision(entity_t* e1, entity_t* e2)
     md2_info_t *md2_info = e2->tag;
     md2_info->st_frm = md2_get_frame(e2, "pain101");
     md2_info->end_frm = md2_get_frame(e2, "pain104");
+    entity_turn_right(e2);
     entity_move_backwards(e2);
     md2_info->cur_frm = 0;
     e2->ontick = guard_pain;
     e2->life -= 10;
     entity_kill(e1);
-     
+    if (e2->life < 0)
+    {
+      md2_info->st_frm = md2_get_frame(e2, "death301");
+      md2_info->end_frm = md2_get_frame(e2, "death308");
+      e2->ontick = guard_death;
+      e2->life = 0;
+    }
     
   }
 }
@@ -235,8 +243,6 @@ void camera_behaviour(entity_t* e)
   }
 }
 
-void guard_attack(entity_t* e1);
-
 void guard_collision(entity_t* e1, entity_t* e2)
 {
   yeti_t *yeti = (yeti_t*)e1->yeti;
@@ -255,8 +261,8 @@ void guard_behaviour(entity_t* e)
   yeti_t* yeti = (yeti_t *)e->yeti;
  /* Use e->tag for info on skin and md2 frames. */
   md2_info_t *md2_info = e->tag;
-  e->visual.data   = testmd2;
- 
+  
+  e->visual.data   = testmd2; 
   e->visual.width  = 8;
   e->visual.height = 12;
   e->radius = 200;
@@ -266,7 +272,7 @@ void guard_behaviour(entity_t* e)
   
   md2_info->st_frm = md2_get_frame(e, "run1");
   md2_info->end_frm = md2_get_frame(e, "run6");
-
+   
   entity_move_forward(e);
   e->xx = friction(e->xx, 50);
   e->yy = friction(e->yy, 50);
@@ -274,11 +280,11 @@ void guard_behaviour(entity_t* e)
   entity_default(e, FALSE, FALSE);
 }
 
-void guard_pain(entity_t*e)
+void guard_pain(entity_t *e)
 {
   md2_info_t *md2_info = e->tag;
   /* Use e->tag for info on skin and md2 frames. */
-  if (md2_info->cur_frm / 2 > md2_info->end_frm - md2_info->st_frm)
+  if ( (md2_info->cur_frm >> 1) > md2_info->end_frm - md2_info->st_frm)
   {
     e->ontick = guard_behaviour;
     md2_info->st_frm = md2_get_frame(e, "run1");
@@ -286,11 +292,26 @@ void guard_pain(entity_t*e)
   }
 
   e->ondraw = md2_draw2;
-  entity_move_backwards(e);
   e->xx = friction(e->xx, 50);
   e->yy = friction(e->yy, 50);
 
   entity_default(e, FALSE, FALSE);
+}
+
+void guard_death(entity_t *e)
+{
+  md2_info_t *md2_info = e->tag;
+  
+  e->swi |= ENTITY_SWI_NO_COLLISION_RESPONSE;
+  if ( (md2_info->cur_frm >> 1) > md2_info->end_frm - md2_info->st_frm)
+  {
+    entity_kill(e);
+  }
+
+  e->ondraw = md2_draw2;
+  e->xx = friction(e->xx, 50);
+  e->yy = friction(e->yy, 50);
+
 }
 
 void guard_attack(entity_t* e)
@@ -298,7 +319,7 @@ void guard_attack(entity_t* e)
   yeti_t* yeti = (yeti_t *)e->yeti;
   md2_info_t *md2_info = e->tag;
   /* Use e->tag for info on skin and md2 frames. */
-  if (md2_info->cur_frm / 2 > md2_info->end_frm - md2_info->st_frm)
+  if (( md2_info->cur_frm >>1) > md2_info->end_frm - md2_info->st_frm)
   {
     e->ontick = guard_behaviour;
     md2_info->st_frm = md2_get_frame(e, "run1");
@@ -352,7 +373,6 @@ void game_init(yeti_t* yeti)
   }
 #endif
 }
-
 
 void game_draw(yeti_t* yeti)
 {

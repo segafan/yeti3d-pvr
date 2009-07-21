@@ -58,7 +58,7 @@ int done=0;    // Keeps track of whether or not we're still playing.
 SDL_Surface *screen; // our video surface
 SDL_Event event;
 model_t *testmd2;
-skin_t skin;
+skin_t *skin;
 
 #define title (YETI_STR_TITLE " SDL Demo " YETI_STR_VERSION " - " YETI_STR_COPYRIGHT)
 
@@ -113,8 +113,6 @@ int main(int argc, char *argv[])
 Uint8* keys;  // to keep track of keypresses later on.
 SDL_Surface *temp_skin;
 SDL_Surface *convert_skin;
-int i, j;
-u16 *skinsrc;
 
   //Initialize SDL video.
   if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0 )
@@ -136,18 +134,14 @@ u16 *skinsrc;
                YETI_VIEWPORT_HEIGHT, SDL_GetError());
     exit(1);
   }
+ 
   convert_skin = SDL_CreateRGBSurface (SDL_SWSURFACE, 256, 256, 16, 
 			31, 31 << 5, 31 << 10, 1<<15);
   SDL_BlitSurface(temp_skin, NULL, convert_skin, NULL);
-  skinsrc = (u16 *)convert_skin->pixels;
-  for (i=0; i< 256; i++)
-  {
-    for (j=0; j< 256; j++)
-      skin[i][j] = skinsrc[j];
-     skinsrc+=256;
-  }
+  skin = (skin_t *)convert_skin->pixels;
+
   SDL_FreeSurface(temp_skin);
-  SDL_FreeSurface(convert_skin);
+
 #ifndef _arch_dreamcast //SDL on the Dreamcast doesn't use a Window manager, so...
   SDL_WM_SetCaption(title, NULL); // Write something a bit more interesting than "SDL App" on our window.
 #endif

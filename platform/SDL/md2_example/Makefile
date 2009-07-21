@@ -15,8 +15,9 @@ SDL_INC_DIR = /usr/include/SDL
 SDL_LIB_DIR = /usr/lib/SDL
 # List all of your C files here, but change the extension to ".o"
 OBJS = main.o ../../../src/data.o ../../../src/draw.o ../../../src/extra.o \
-       ../../../src/font.o  game.o ../../../src/maps.o ../../../src/model.o\
-       ../../../src/md2.o ../../../src/sprites.o ../../../src/yeti.o
+       ../../../src/font.o  ../../common/md2/game.o ../../../src/maps.o \
+       ../../../src/model.o ../../../src/md2.o ../../../src/sprites.o \
+       ../../../src/yeti.o
 
 all: rm-elf $(TARGET)
 

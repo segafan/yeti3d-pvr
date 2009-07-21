@@ -55,13 +55,13 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
    way that it's difficult to switch display lists when we need to. Using memalign
    would probably work just as well, but these won't ever need to change, right? */
    
-static uint8 op_vbuf[1024 * 512] __attribute__((aligned(32)));
+static uint8 op_vbuf[1024 * 1024] __attribute__((aligned(32)));
 static uint8 tr_vbuf[1024 * 256] __attribute__((aligned(32)));
 
 pvr_ptr_t texture[YETI_TEXTURE_MAX];
 
-static float yeti_to_gl = 1.0 / (256 * 64); /* From the OpenGL example. */
-
+static float yeti_to_gl = 1.0 / (256 * 64); /* From the OpenGL example, for texture u/v. */
+static float md2_to_pvr = 1.0 / (256 * 256); /* For calculating u/v for md2 models. */
 /* My understanding of this method of sorting vertices for polygon rendering came
    from KGL, but since Yeti only allows a maximum of 16 vertices for a polygon,
    this might be much simpler and faster than sorting vertices each time
@@ -99,7 +99,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   pvr_poly_cxt_t cxt;
   pvr_poly_hdr_t hdr;
   pvr_vertex_t vert;
-  int order[16];
+  int *order;
 
 /* If we do not have at least 3 vertices, we do not have a polygon. */ 
   if (n < 3)
@@ -110,12 +110,11 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   pvr_list_prim(PVR_LIST_OP_POLY, &hdr, sizeof(hdr));
   vert.oargb = 0;
   
- for (i=n; i--;)
-   order[n-1-i] = orders[ (16* (n-1)) + i]; /* There is a better way to do this.  Why the need to copy? */
-   
+  order = orders+(16*(n-1));
+ 
  for (i=n; i--;)
  {
-   int j = order[i];
+   int j = order[n-1-i];
    /* Stolen from KGL to get the z value of the vertices. */
    float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = 40.0/f2fl(src[j]->z), w = 1.0f;
 		mat_trans_single4(x, y, z, w);				
@@ -151,7 +150,7 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
     
     /* We should probably check the values of vert.x and vert.y against the viewport, but right
       now it seems to work ok without... */
-    vert.x = f2fl(p[i].x);
+    vert.x = f2fl(p[i].x); 
     vert.y = f2fl(p[i].y);
     vert.z = f2fl(p[i].z);
     vert.u = p[i].u * yeti_to_gl;
@@ -163,31 +162,33 @@ void CODE_IN_IWRAM draw_clipped_poly(yeti_t* yeti, polyclip_t src, int n, int ti
   }
 }
 
+void md2_start(u16* skin)
+{
+  pvr_poly_cxt_t cxt;
+  pvr_poly_hdr_t hdr;
+  
+    pvr_poly_cxt_txr(&cxt, PVR_LIST_OP_POLY, PVR_TXRFMT_RGB565, 256, 256, skin, PVR_FILTER_TRILINEAR1);
+    pvr_poly_compile(&hdr, &cxt);
+    pvr_list_prim(PVR_LIST_OP_POLY, &hdr, sizeof(hdr));
+}
+
 /* Our md2_clipped poly should look an awful lot like our draw_clipped_poly. */
 void CODE_IN_IWRAM md2_clipped_poly(yeti_t* yeti, polyclip_t src, int n, u16* skin)
 {
   int i;
   polygon_t p;
-  pvr_poly_cxt_t cxt;
-  pvr_poly_hdr_t hdr;
   pvr_vertex_t vert;
-  int order[16];
-
+  int *order;
+  
 /* If we do not have at least 3 vertices, we do not have a polygon. */ 
   if (n < 3)
     return;
-  
-  pvr_poly_cxt_txr(&cxt, PVR_LIST_OP_POLY, PVR_TXRFMT_RGB565, 256, 256, skin, PVR_FILTER_TRILINEAR1);
-  pvr_poly_compile(&hdr, &cxt);
-  pvr_list_prim(PVR_LIST_OP_POLY, &hdr, sizeof(hdr));
-  vert.oargb = 0;
-  
- for (i=n; i--;)
-   order[n-1-i] = orders[ (16* (n-1)) + i]; /* There is a better way to do this.  Why the need to copy? */
+ 
+ order = orders+(16*(n-1));
  
  for (i=n; i--;)
  {
-   int j = order[i];
+   int j = order[n-1-i];
 
    float x = f2fl(src[j]->x), y = f2fl(src[j]->y), z = 40.0/f2fl(src[j]->z), w = 1.0f;
 		mat_trans_single4(x, y, z, w);				
@@ -205,21 +206,22 @@ void CODE_IN_IWRAM md2_clipped_poly(yeti_t* yeti, polyclip_t src, int n, u16* sk
  }
 
   
-
+   vert.oargb = 0;
+   
 /* Draw the polygon */
   for (i=n; i--;) 
   {
   /* We should be able to do some cheap lighting here... */
-   /* float c = 1.0 * p[i].l / i2f(63); 
+    float c = 1.0 * p[i].l / i2f(63); 
     
-    vert.argb = PVR_PACK_COLOR(1.0f, c, c, c); */
-     vert.argb = PVR_PACK_COLOR(1.0f, 1.0f, 1.0f, 1.0f);
+    vert.argb = PVR_PACK_COLOR(1.0f, c, c, c); 
+  /*   vert.argb = PVR_PACK_COLOR(1.0f, 1.0f, 1.0f, 1.0f);*/
 
-    vert.x = f2fl(p[i].x);
+    vert.x = f2fl(p[i].x); 
     vert.y = f2fl(p[i].y);
     vert.z = f2fl(p[i].z);
-    vert.u = f2i(p[i].u) * 1.0f / 256.0f;
-    vert.v = f2i(p[i].v) * 1.0f / 256.0f;
+    vert.u = p[i].u * md2_to_pvr;
+    vert.v = p[i].v * md2_to_pvr;
     
     vert.flags = (i) ? PVR_CMD_VERTEX : PVR_CMD_VERTEX_EOL ;
     
@@ -257,8 +259,8 @@ static pvr_init_params_t yeti_pvr_params = {
 	{ PVR_BINSIZE_16, PVR_BINSIZE_0, PVR_BINSIZE_16, PVR_BINSIZE_0, PVR_BINSIZE_0 },
 
 	/* Vertex buffer size */
-	384*1024,
-	
+	/*384*1024,*/
+	1280*1024,	
 	1, /* Enable PVR DMA */
 	0 /* No fsaa */
 };
@@ -267,13 +269,13 @@ void yeti_pvr_init()
 {
   pvr_init(&yeti_pvr_params); /* Initialize the pvr using the params specified above. */
   
-  pvr_set_vertbuf(PVR_LIST_OP_POLY, op_vbuf, 1024 * 512);
+  pvr_set_vertbuf(PVR_LIST_OP_POLY, op_vbuf, 1024 * 1024);
   pvr_set_vertbuf(PVR_LIST_TR_POLY, tr_vbuf, 1024 * 256);
   pvr_set_pal_format(PVR_PAL_ARGB8888); /* Set up the 8bpp palette format. */
   
     /* Try to make a stripped-down version of the plx_mat3d stuff.
       We don't need all of libparallax (or even all of the mat3d.c stuff..).
-      Maybe merge in some of the stuff up above (that came from KGL) and move it
+      Maybe merge in some of the stuff up above (that came from KGL) and move itb
       to a new module with the GL-like stuff in it? */
       
   plx_mat3d_init();
