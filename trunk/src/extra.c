@@ -60,3 +60,19 @@ void* yeti_load_file(char* filename)
   }
   return r;
 }
+
+int yeti_save_file(void *buffer, int size, char* filename)
+{
+  FILE* fp = fopen(filename, "wb");
+
+  if (fp)
+  {
+    int n;
+       n = fwrite(buffer, 1, size, fp);
+
+    fclose(fp);
+    return n;
+  }
+  fclose(fp);
+  return 0;
+}

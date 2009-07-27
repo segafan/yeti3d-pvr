@@ -36,28 +36,24 @@ Prepared for public release: 10/24/2003 - Derek J. Evans <derek@theteahouse.com.
 **   YY   EEEEEE   TT   IIIIII 33333  DDDDD
 */
 
-#ifndef __EXTRA_H__
-#define __EXTRA_H__
+#ifndef __GAME_H__
+#define __GAME_H__
 
-#include "yeti.h"
-
-/******************************************************************************/
-
-#include <stdio.h>
-#include <stdlib.h>
+#include "../../src/yeti.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-void* yeti_load_file(char* filename);
-
-int yeti_save_file(void *buffer, int size, char* filename);
+extern void nogame_init(yeti_t* yeti);
+extern void game_init(yeti_t* yeti);
+extern void game_draw(yeti_t* yeti);
+extern void game_tick(yeti_t* yeti);
+extern void game_loop(yeti_t* yeti);
 
 #ifdef __cplusplus
-};
+} // extern "C"
 #endif
 
-/******************************************************************************/
-
 #endif
+
