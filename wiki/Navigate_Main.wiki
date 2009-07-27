@@ -1,6 +1,8 @@
 #summary Wiki Topics
 [General_Information General Information]
 ----
+[New_Editor New Map Editor]
+----
 [Example_Code Example Code]
   * [PVR_Example_Code Basic PVR Example]
   * [SDL_Example_Code Basic SDL Example]
