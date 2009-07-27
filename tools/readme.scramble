@@ -6,4 +6,4 @@ and this is the program that everyone uses to scramble their binaries.
 To compile (under Linux), typing "gcc -o scramble scramble.c"
 should give you a working scramble executable.  Windows (Cygwin) users will
 probably want to type "gcc -o scramble.exe scramble.c," although you probably
-already have scramble if you're using the DCDev ISO.
+already have scramble if you're using the DCDev ISO by fackue.
