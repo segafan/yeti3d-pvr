@@ -38,7 +38,7 @@ There are two edit modes.  The first mode we'll call "wall drawing," and the sec
 Type "help" or "h" into the editor's console to get a list of valid commands and
 key combinations for editing your map.
 
-To save your map, you can press Ctrl+S and type a filename when prompted.  Be sure that the folder you wish to save the file to exists, because the program will crash if it does not.  This will save the map, palette, and textures in one file.
+To save your map, you can press Ctrl+S and type a filename when prompted.  Be sure that the folder you wish to save the file to exists, because the program will complain if it does not.  This will save the map, palette, and textures in one file.
 
 To load your map later, you can press Ctrl+L and type in the filename when prompted.
 
