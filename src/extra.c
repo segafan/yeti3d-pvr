@@ -73,6 +73,6 @@ int yeti_save_file(void *buffer, int size, char* filename)
     fclose(fp);
     return n;
   }
-  fclose(fp);
+
   return 0;
 }

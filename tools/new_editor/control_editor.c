@@ -72,6 +72,8 @@ static hotkey_desc hotkey_table[] = {
   {"Ctrl+T","Scroll textures up (shows next 4 textures)."},
   {"Shift+T","Select next texture from textures in window."},
   {"Ctrl+E", "View/hide entities (sets camera to original position as well)."},
+  {"Ctrl+L", "Load a project file (includes map, palette, and textures)."},
+  {"Ctrl+S", "Save a project file (includes map, palette, and textures)."},
   {"Ctrl+Q", "Exit the program"},
   {NULL,NULL}
 };
@@ -132,11 +134,14 @@ void SaveMap(ConsoleInformation *console, int argc, char* argv[])
           strcpy((char *)e1m2->auth, (char *)map_auth);
           strcpy((char *)e1m2->desc, (char *)map_desc);
         yeti_save_map(sasquatch, e1m2);
-        yeti_save_file((void *)e1m2,sizeof(rom_map_t), argv[1]);
+        if (yeti_save_file((void *)e1m2,sizeof(rom_map_t), argv[1]) >0)
+	  CON_Out(console, "%s: Map saved.", argv[1]);
+	else
+	  CON_Out(console, "Error saving map: %s may not be a valid filepath", argv[1]);
 	free(e1m2);
-	CON_Out(console, "%s: Map saved.", argv[1]);
+	
       }else{
-        CON_Out(console, "%s: this file name/path appears to be invalid.", argv[1]);
+        CON_Out(console, "%s: Error allocating memory for map.", argv[1]);
       }
    }else{
       CON_Out(console, "usage: %s <mapfile>", argv[0]);
