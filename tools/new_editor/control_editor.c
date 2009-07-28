@@ -43,7 +43,7 @@ extern int tex_updated;
 extern int texture_base;
 extern int texture_selected;
 extern int num_tex;
-extern int cell_active[YETI_MAP_WIDTH][YETI_MAP_WIDTH];
+extern int cell_active[YETI_MAP_HEIGHT][YETI_MAP_WIDTH];
 extern ConsoleInformation *edit_console;
 
 static u8 map_name[32];
@@ -92,7 +92,18 @@ static hotkey_desc mapedit_table[] ={
   {"End", "Decrease wall texture id in selected cell(s)"},
   {"PgUp", "Increase ceiling texture id in selected cell(s)"},
   {"PgDn", "Decrease ceiling texture id in selected cell(s)"},
-  {"E", "Place an entity in currently selected cell(s)."},
+  {"E", "Place an entity in currently selected cell(s)"},
+  {NULL,NULL}
+};
+
+static hotkey_desc mouse_table[] ={
+  {"Left", "Set as floor texture for selected cell(s)(in texture window)"},
+  {"Middle", "Set as wall texture for selected cell(s)(in texture window)"},
+  {"Right", "Set as ceiling texture for selected cell(s)(in texture window)"},
+  {"Left", "Draw wall in cell (in map window in wall drawing mode)"},
+  {"Right", "Clear wall from cell (in map window in wall drawing mode)"},
+  {"Left", "Select cell(s) (in map window in selection mode)"},
+  {"Right", "Deselect all cells (in map window in selection mode)"},
   {NULL,NULL}
 };
 
@@ -399,6 +410,14 @@ void ToggleEntities()
   }
 }
 
+void NewMap(ConsoleInformation *console, int argc, char* argv[])
+{
+   yeti_init_map(sasquatch);
+   strcpy((char *)map_name,"\n");
+   strcpy((char *)map_auth,"\n");
+   strcpy((char *)map_desc,"\n");
+}
+
 void ShowHelp(ConsoleInformation *console, int argc, char* argv[]);
 
 static command_t cmd_table[] = {
@@ -408,6 +427,7 @@ static command_t cmd_table[] = {
   { "loadpalette", LoadPalette, "Load texture palette from <filename>." },
   { "mapname", MapName, "Display the name, author, decription of the current map." },
   { "namemap", NameMap, "Set the name[, author, description] of the current map."},
+  { "newmap", NewMap, "Start a new map."},
   { "mousemode", MouseMode, "Toggle mousemode between <wall | selection>."},
   { "editmode", MouseMode, "Toggle mousemode between <wall | selection>."},
   { "clearscreen", ClearScreen, "Clear the console window history." },
@@ -438,6 +458,12 @@ void ShowHelp(ConsoleInformation *console, int argc, char* argv[])
   CON_NewLineConsole(console);
   CON_Out(console, "Valid hotkey commands:");
   for (hotkey = hotkey_table; hotkey->desc; hotkey++)
+  {
+      CON_Out(console, "%s: %s", hotkey->key, hotkey->desc);
+  }
+  CON_NewLineConsole(console);
+  CON_Out(console, "Mouse-click commands:");
+  for (hotkey = mouse_table; hotkey->desc; hotkey++)
   {
       CON_Out(console, "%s: %s", hotkey->key, hotkey->desc);
   }
@@ -697,6 +723,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
+	     if ( (x > 0) && (y > 0) &&(x < YETI_MAP_WIDTH  - 1) &&(y <YETI_MAP_HEIGHT - 1) )
 	       sasquatch->cells[y][x].bot += 64;
 	     }
 	   }
@@ -708,6 +735,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
+	     if ( (x > 0) && (y > 0) &&(x < YETI_MAP_WIDTH  - 1) &&(y <YETI_MAP_HEIGHT - 1) )
 	       sasquatch->cells[y][x].bot -= 64;
 	     }
 	   }
@@ -719,6 +747,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
+	     if ( (x > 0) && (y > 0) &&(x < YETI_MAP_WIDTH  - 1) &&(y <YETI_MAP_HEIGHT - 1) )
 	       sasquatch->cells[y][x].top += 64;
 	     }
 	   }
@@ -730,6 +759,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
+	     if ( (x > 0) && (y > 0) &&(x < YETI_MAP_WIDTH  - 1) &&(y <YETI_MAP_HEIGHT - 1) )
 	       sasquatch->cells[y][x].top -= 64;
 	     }
 	   }
@@ -742,7 +772,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
-	       sasquatch->cells[y][x].btx = ((texture_selected)%12)+ texture_base;
+	       sasquatch->cells[y][x].btx = (((texture_selected)%12)+ texture_base)%num_tex;
 	     }
 	   }
 	 }
@@ -753,7 +783,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
-	       sasquatch->cells[y][x].btx = ((texture_selected)%12)+ texture_base;
+	       sasquatch->cells[y][x].btx = (((texture_selected)%12)+ texture_base)%num_tex;
 	     }
 	   }
 	 }
@@ -766,7 +796,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
-	       sasquatch->cells[y][x].wtx = ((texture_selected)%12)+ texture_base;
+	       sasquatch->cells[y][x].wtx = (((texture_selected)%12)+ texture_base)%num_tex;
 	     }
 	   }
 	 }
@@ -778,7 +808,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
-	       sasquatch->cells[y][x].wtx = ((texture_selected)%12)+ texture_base;
+	       sasquatch->cells[y][x].wtx = (((texture_selected)%12)+ texture_base)%num_tex;
 	     }
 	   }
 	 }
@@ -791,7 +821,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
-	       sasquatch->cells[y][x].ttx = ((texture_selected)%12)+ texture_base;
+	       sasquatch->cells[y][x].ttx = (((texture_selected)%12)+ texture_base)%num_tex;
 	     }
 	   }
 	 }
@@ -803,7 +833,7 @@ u8 *keys;
          for (y=0; y<YETI_MAP_HEIGHT; y++){
 	   for (x=0; x<YETI_MAP_HEIGHT; x++){
 	     if (cell_active[y][x]){
-	       sasquatch->cells[y][x].ttx = ((texture_selected)%12)+ texture_base;
+	       sasquatch->cells[y][x].ttx = (((texture_selected)%12)+ texture_base)%num_tex;
 	     }
 	   }
 	 }
