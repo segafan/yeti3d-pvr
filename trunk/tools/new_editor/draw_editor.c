@@ -84,19 +84,17 @@ static void MouseButtonDown()
     mousex -= maprect.x; mousey -= maprect.y;
     if (EditMouseMode)
     {
-       /* mousex -= maprect.x; mousey -= maprect.y; */
        if (MouseButtons & SDL_BUTTON_RMASK)
        {
-         /* cell_active[YETI_MAP_HEIGHT - (mousey/7)-1][mousex/7] ^= 1; */
 	 deactivate_all_cells();
 	 EditMouse.button = SDL_BUTTON_RMASK;
        }else if (MouseButtons & SDL_BUTTON_LMASK){
       
          deactivate_all_cells();
-	 cell_active[YETI_MAP_HEIGHT - (mousey/7)-1][mousex/7] ^= 1;
+	 cell_active[YETI_MAP_HEIGHT - (mousey/7)-1][mousex/7] = 1;
 	 EditMouse.startx = mousex + maprect.x; EditMouse.starty = mousey + maprect.y;
          EditMouse.dragging = 1;       
-         EditMouse.button = SDL_BUTTON_LEFT;
+         EditMouse.button = SDL_BUTTON_LMASK;
        }
      } else {
         if (MouseButtons & SDL_BUTTON_LMASK)
@@ -107,8 +105,71 @@ static void MouseButtonDown()
 	  cell_block(&sasquatch->cells[YETI_MAP_HEIGHT - (mousey/7)-1][mousex/7], 0);
 	}
      }
-  } 
- /* Check for texture clicks */ 
+  } else
+ /* Check for texture clicks */
+  if ( (mousex > texrect.x) && (mousex < texrect.x + texrect.w)
+    && (mousey > texrect.y) && (mousey < texrect.y + texrect.h))
+  {
+  
+        int i, j;
+        int start_x = 12;
+        int start_y = 12;
+	int x, y;
+	mousex -= texrect.x; mousey -= texrect.y;
+	
+          for (i=0; i<3; i++)
+          {
+           SDL_Rect cur_rect;
+           cur_rect.x = start_x;
+           cur_rect.y = (i * 74)+start_y;
+           cur_rect.w = cur_rect.h = 64;
+
+             for (j=0; j<4; j++)
+             {
+	       if ( (mousex > cur_rect.x) && (mousex < cur_rect.x + cur_rect.w)
+    			&& (mousey > cur_rect.y) && (mousey < cur_rect.y + cur_rect.h))
+	       {
+		texture_selected = (i*4)+j;
+		tex_updated++;
+		if (MouseButtons & SDL_BUTTON_LMASK)
+		{
+		  for(y=0; y<YETI_MAP_HEIGHT; y++)
+		  {
+		    for(x=0; x<YETI_MAP_WIDTH; x++)
+		    {
+		      if (cell_active[y][x])
+		        sasquatch->cells[y][x].btx = (texture_base + texture_selected)%num_tex;
+		    }
+		  }
+		} else if (MouseButtons & SDL_BUTTON_RMASK)
+		{
+		  for(y=0; y<YETI_MAP_HEIGHT; y++)
+		  {
+		    for(x=0; x<YETI_MAP_WIDTH; x++)
+		    {
+		      if (cell_active[y][x])
+		        sasquatch->cells[y][x].ttx = (texture_base + texture_selected)%num_tex;
+		    }
+		  }
+		}else if (MouseButtons & SDL_BUTTON_MMASK)
+		{
+		  for(y=0; y<YETI_MAP_HEIGHT; y++)
+		  {
+		    for(x=0; x<YETI_MAP_WIDTH; x++)
+		    {
+		      if (cell_active[y][x])
+		        sasquatch->cells[y][x].wtx = (texture_base + texture_selected)%num_tex;
+		    }
+		  }
+		}
+		return;
+	       }
+               cur_rect.x +=77;
+             }
+          } 
+	
+    
+    }
 }
 
 static void MouseButtonUp()
@@ -124,14 +185,20 @@ static void MouseButtonUp()
     if ((EditMouse.startx > maprect.x) && (EditMouse.startx < maprect.x + maprect.w)
     && (EditMouse.starty > maprect.y) && (EditMouse.starty < maprect.y + maprect.h))
     {
+    if (EditMouse.rect.y < 0) EditMouse.rect.y = 0;
+    if (EditMouse.rect.y > 7*(YETI_MAP_HEIGHT-1)) EditMouse.rect.y = 7*(YETI_MAP_HEIGHT - 1);
+    if (EditMouse.rect.x < 0) EditMouse.rect.x = 0;
+    if (EditMouse.rect.x > 7*(YETI_MAP_WIDTH-1)) EditMouse.rect.x = 7*(YETI_MAP_WIDTH - 1);
       for (y=EditMouse.rect.y; y<EditMouse.rect.y + EditMouse.rect.h; y++){
        for (x=EditMouse.rect.x; x<EditMouse.rect.x + EditMouse.rect.w; x++){
         cell_active[YETI_MAP_HEIGHT - (y/7) -1][x/7] = 1;
        }
       }
-    } /* If (EditMouse.startx > .... ) */
-        
+    } /* if (EditMouse.startx > ... ... ... maprect.y + maprect.h) */
+    
+     
   } /* if (!(MouseButtons & SDL_BUTTON_LMASK)) */
+  
 }
 
 /* We only drag on the map, so we could handle most of the drag-to-activate stuff here... */
@@ -326,6 +393,8 @@ void draw_editor(yeti_t yeti, SDL_Surface *viewport, SDL_Surface *screen)
   CON_DrawConsole(EID_Console);
   CON_DrawConsole(LoadSave_Console);
   SDL_Flip(screen);
+  
+  SDL_FillRect(viewport, NULL, 0);
 }
 
 void draw_setup(yeti_t *yeti)
