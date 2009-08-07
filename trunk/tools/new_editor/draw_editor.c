@@ -106,7 +106,8 @@ static void MouseButtonDown()
 	}
      }
   } else
- /* Check for texture clicks */
+ /* Check for texture clicks.*/
+ /*TODO:  This would be better on un-click. */
   if ( (mousex > texrect.x) && (mousex < texrect.x + texrect.w)
     && (mousey > texrect.y) && (mousey < texrect.y + texrect.h))
   {
@@ -131,7 +132,7 @@ static void MouseButtonDown()
 	       {
 		texture_selected = (i*4)+j;
 		tex_updated++;
-		if (MouseButtons & SDL_BUTTON_LMASK)
+		if ( (MouseButtons & SDL_BUTTON_LMASK)&&(!(MouseButtons & SDL_BUTTON_RMASK)))
 		{
 		  for(y=0; y<YETI_MAP_HEIGHT; y++)
 		  {
@@ -141,7 +142,7 @@ static void MouseButtonDown()
 		        sasquatch->cells[y][x].btx = (texture_base + texture_selected)%num_tex;
 		    }
 		  }
-		} else if (MouseButtons & SDL_BUTTON_RMASK)
+		} else if ( (MouseButtons & SDL_BUTTON_RMASK)&&(!(MouseButtons & SDL_BUTTON_LMASK)))
 		{
 		  for(y=0; y<YETI_MAP_HEIGHT; y++)
 		  {
@@ -151,7 +152,7 @@ static void MouseButtonDown()
 		        sasquatch->cells[y][x].ttx = (texture_base + texture_selected)%num_tex;
 		    }
 		  }
-		}else if (MouseButtons & SDL_BUTTON_MMASK)
+		}else if ((MouseButtons & SDL_BUTTON_MMASK) ||( (MouseButtons & SDL_BUTTON_RMASK)&&(MouseButtons & SDL_BUTTON_LMASK)))
 		{
 		  for(y=0; y<YETI_MAP_HEIGHT; y++)
 		  {
@@ -421,10 +422,16 @@ void draw_setup(yeti_t *yeti)
   edit_console = CON_Init("ConsoleFont.gif", Screen, 100, conrect);
   CON_SetExecuteFunction(edit_console, Command_Handler);
   CON_Background(edit_console, "blueguy.bmp", 420,10);
+  Clear_History(edit_console);
   CON_Out(edit_console, "Welcome to the Yeti3D Map Editor!");
   CON_Out(edit_console, "Copyright (C) 2009 - Joshua Sutherland");
   CON_Out(edit_console, "Built with and for the Yeti3D Portable Engine");
   CON_Out(edit_console, "Copyright (C) 2003 - Derek John Evans");
+  CON_NewLineConsole(edit_console);
+  CON_Out(edit_console, "This software comes with ABSOLUTELY NO WARRANTY. This is free software, ");
+  CON_Out(edit_console, "and you are welcome to redistribute it under certain conditions.");
+  CON_Out(edit_console, "Please see the GNU GPL version 2 for full details.");
+
 
   CON_SetPrompt(edit_console, "Type command: ");
   CON_Show(edit_console);
