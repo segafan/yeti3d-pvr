@@ -99,6 +99,7 @@ static hotkey_desc mapedit_table[] ={
 static hotkey_desc mouse_table[] ={
   {"Left", "Set as floor texture for selected cell(s)(in texture window)"},
   {"Middle", "Set as wall texture for selected cell(s)(in texture window)"},
+  {"      ", "(Use Left + Right to simulate middle on a 2-button mouse)"},
   {"Right", "Set as ceiling texture for selected cell(s)(in texture window)"},
   {"Left", "Draw wall in cell (in map window in wall drawing mode)"},
   {"Right", "Clear wall from cell (in map window in wall drawing mode)"},
@@ -499,7 +500,7 @@ void Command_Handler(ConsoleInformation *console, char* command)
   }
   
   CON_Out(console, "Invalid command entered.");
-
+  free(linecopy);
 }
 
 static int EID;
@@ -554,6 +555,7 @@ void EID_Handler(ConsoleInformation *console, char* command)
     if (!(edit_console->Visible == CON_CLOSED))
       CON_Topmost(edit_console);
     CON_Hide(console);
+    free(linecopy);
     return;
   }
   
@@ -572,6 +574,7 @@ void EID_Handler(ConsoleInformation *console, char* command)
   if (!(edit_console->Visible == CON_CLOSED))
       CON_Topmost(edit_console);
   CON_Hide(console);
+  free(linecopy);
 }
 
 void Save_Handler(ConsoleInformation *console, char* command)
@@ -599,6 +602,7 @@ void Save_Handler(ConsoleInformation *console, char* command)
   if (!(edit_console->Visible == CON_CLOSED))
       CON_Topmost(edit_console);
   CON_Hide(console);
+  free(linecopy);
 }
 
 void Load_Handler(ConsoleInformation *console, char* command)
@@ -626,6 +630,7 @@ void Load_Handler(ConsoleInformation *console, char* command)
   if (!(edit_console->Visible == CON_CLOSED))
       CON_Topmost(edit_console);
   CON_Hide(console);
+  free(linecopy);
 }
 /****************************************************************************************************************
 
